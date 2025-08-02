@@ -1,4 +1,4 @@
-name: Android Build
+name: Android ARMv7 Build
 
 on:
   push:
@@ -19,14 +19,40 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Grant gradlew permissions
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install build tools (cmake, ninja)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build APK
-        run: ./gradlew :app:assembleDebug
+      - name: Build APK for armeabi-v7a
+        env:
+          ABI_FILTER: armeabi-v7a
+        run: |
+          echo "android {
+            defaultConfig {
+              ndk {
+                abiFilters '${ABI_FILTER}'
+              }
+            }
+          }" >> app/abi.gradle.kts
+
+          echo "apply(from = \"abi.gradle.kts\")" >> app/build.gradle.kts
+
+          ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Search for APKs
+        run: find . -type f -name "*.apk"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: armeabi-v7a-apk
+          path: '**/*.apk'
