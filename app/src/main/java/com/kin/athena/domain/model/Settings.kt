@@ -75,7 +75,7 @@ data class Settings(
     val adBlocker: Boolean = false,
     val trackerProtection: Boolean = false,
 
-    val premiumUnlocked: Boolean = false,
+    val premiumUnlocked: Boolean = true,
 
     val dontShowHelp: Boolean = false
 )
