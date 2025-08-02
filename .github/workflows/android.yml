@@ -33,13 +33,13 @@ jobs:
         run: ./gradlew assemblePlaystoreDebug
 
       - name: Upload F-Droid APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: athena-fdroid-debug
           path: app/build/outputs/apk/fdroid/debug/app-fdroid-debug.apk
 
       - name: Upload Play Store APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: athena-playstore-debug
           path: app/build/outputs/apk/playstore/debug/app-playstore-debug.apk
