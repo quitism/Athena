@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -26,14 +25,14 @@ android {
         androidResources {
             localeFilters += listOf("en")
         }
-        externalNativeBuild {
-            cmake {
-                cppFlags += ""
-                abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
-            }
-        }
+        //        externalNativeBuild {
+//            cmake {
+//                cppFlags += ""
+//                abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+//            }
+//        }
         ndk {
-            abiFilters.add(project.findProperty("abiFilter") as? String ?: "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
         }
     }
 
@@ -72,7 +71,7 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-    
+
     // Make all build variants depend on Go libraries
     tasks.whenTaskAdded {
         if (name.startsWith("merge") && name.contains("JniLibFolders")) {
@@ -111,52 +110,52 @@ android {
             jniLibs.srcDirs("libs/")
         }
     }
-    
-    tasks.register<Exec>("buildGoLibraries") {
-        group = "build"
-        description = "Build Go libraries for Android"
-        
-        val goDir = layout.projectDirectory.dir("src/main/go")
-        val libsDir = layout.projectDirectory.dir("libs")
-        
-        inputs.dir(goDir)
-        outputs.files(
-            libsDir.file("arm64-v8a/libnflog.so"),
-            libsDir.file("armeabi-v7a/libnflog.so")
-        )
-        outputs.upToDateWhen { false }
-        
-        workingDir(goDir)
-        
-        val isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows
-        val buildScript = if (isWindows) "build-android.bat" else "build-android.sh"
-        
-        if (isWindows) {
-            commandLine("cmd", "/c", buildScript)
-        } else {
-            commandLine("bash", buildScript)
-        }
-        
-        doFirst {
-            val buildScriptFile = goDir.file(buildScript).asFile
-            if (!buildScriptFile.exists()) {
-                throw GradleException("Build script $buildScript not found in ${goDir.asFile}")
-            }
-            
-            libsDir.dir("arm64-v8a").asFile.mkdirs()
-            libsDir.dir("armeabi-v7a").asFile.mkdirs()
-        }
-    }
+
+    //    tasks.register<Exec>("buildGoLibraries") {
+//        group = "build"
+//        description = "Build Go libraries for Android"
+//
+//        val goDir = layout.projectDirectory.dir("src/main/go")
+//        val libsDir = layout.projectDirectory.dir("libs")
+//
+//        inputs.dir(goDir)
+//        outputs.files(
+//            libsDir.file("arm64-v8a/libnflog.so"),
+//            libsDir.file("armeabi-v7a/libnflog.so")
+//        )
+//        outputs.upToDateWhen { false }
+//
+//        workingDir(goDir)
+//
+//        val isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows
+//        val buildScript = if (isWindows) "build-android.bat" else "build-android.sh"
+//
+//        if (isWindows) {
+//            commandLine("cmd", "/c", buildScript)
+//        } else {
+//            commandLine("bash", buildScript)
+//        }
+//
+//        doFirst {
+//            val buildScriptFile = goDir.file(buildScript).asFile
+//            if (!buildScriptFile.exists()) {
+//                throw GradleException("Build script $buildScript not found in ${goDir.asFile}")
+//            }
+//
+//            libsDir.dir("arm64-v8a").asFile.mkdirs()
+//            libsDir.dir("armeabi-v7a").asFile.mkdirs()
+//        }
+//    }
     ksp {
         arg("dagger.fastInit", "enabled")
         arg("room.schemaLocation", "$projectDir/schemas")
     }
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
+    //    externalNativeBuild {
+//        cmake {
+//            path = file("src/main/cpp/CMakeLists.txt")
+//            version = "3.22.1"
+//        }
+//    }
     packaging {
         jniLibs.useLegacyPackaging = true
     }
